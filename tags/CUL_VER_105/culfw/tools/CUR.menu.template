@@ -1,0 +1,24 @@
+M Main
+S FS20 FS20
+S Control Control
+
+M FS20
+<xmllist>
+
+M FS20-Plain
+C Toggle F$12
+C On F$11
+C Off F$00
+
+M FS20-Dim
+C Toggle F$12
+C On F$11
+C Off F$00
+C Dimup F$13
+C Dimdown $14
+
+M Control
+C:Backlight on:dFF01FF
+C:Backlight off:LdFF00
+C:Contrast +:dFFFFFE
+C:Contrast -:dFFFFFD
