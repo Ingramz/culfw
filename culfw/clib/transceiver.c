@@ -71,13 +71,12 @@ static void reset_both_in_buckets(void);
 void
 tx_init(void)
 {
-  CC1100_OUT_DDR  |=  _BV(CC1100_OUT_PIN);
-  CC1100_OUT_PORT &= ~_BV(CC1100_OUT_PIN);
+  CC1100_CS_DDR  |=  _BV(CC1100_PINOUT);
+  CC1100_CS_PORT &= ~_BV(CC1100_PINOUT);
 
-  CC1100_IN_DDR  &=  ~_BV(CC1100_IN_PIN);
-
+  CLEAR_BIT( CC1100_CS_DDR, CC1100_PININ );// Want Input
   EICRB |= _BV(CC1100_ISC);                // Any edge of INTx generates an int.
-  EIFR  |= _BV(CC1100_INT);
+  EIFR  |= _BV(CC1100_INTF);
   EIMSK |= _BV(CC1100_INT);
 
   credit_10ms = MAX_CREDIT/2;
@@ -102,20 +101,35 @@ set_txreport(char *in)
 
     ccInitChip();
     ccRX();
+
   } else {
+
     ccStrobe(CC1100_SIDLE);
+
   }
 }
 
+////////////////////////////////////////////////////
+// Transmitter
 static void
 send_bit(uint8_t bit)
 {
-  CC1100_OUT_PORT |= _BV(CC1100_OUT_PIN);         // High
-  my_delay_us(bit ? wait_high_one : wait_high_zero);
+  CC1100_CS_PORT |= _BV(CC1100_PINOUT);         // High
+  if(bit) {
 
-  CC1100_OUT_PORT &= ~_BV(CC1100_OUT_PIN);       // Low
-  my_delay_us(bit ? wait_low_one : wait_low_zero);
+    my_delay_us(wait_high_one);
+    CC1100_CS_PORT &= ~_BV(CC1100_PINOUT);      // Low
+    my_delay_us(wait_low_one);
+
+  } else {
+
+    my_delay_us(wait_high_zero);
+    CC1100_CS_PORT &= ~_BV(CC1100_PINOUT);      // Low
+    my_delay_us(wait_low_zero);
+
+  }
 }
+
 
 
 // msg is with parity/checksum already added
@@ -133,7 +147,7 @@ sendraw(uint8_t *msg, uint8_t nbyte, uint8_t bitoff,
   credit_10ms -= sum;
 
   LED_ON();
-  ccTX();                       // Enable TX 
+  ccTX();
   my_delay_ms(1);
 
   do {
@@ -157,6 +171,7 @@ sendraw(uint8_t *msg, uint8_t nbyte, uint8_t bitoff,
   } else {
     ccStrobe(CC1100_SIDLE);
   }
+
   LED_OFF();
 }
 
@@ -368,7 +383,6 @@ TASK(RfAnalyze_Task)
 
   }
 
-
   if(!datatype && fb->state == STATE_COLLECT) {
     if(analyze(fb, TYPE_KS300)) {
       oby--;                                 
@@ -418,7 +432,6 @@ TASK(RfAnalyze_Task)
       for(roby = 0; roby < oby; roby++)
         robuf[roby] = obuf[roby];
       rday=day; rhour=hour; rminute=minute; rsec=sec; rhsec=hsec;
-
     }
 
     if(!isrep) {
@@ -520,7 +533,7 @@ ISR(CC1100_INTVECT)
   bucket_t *b;                          // where to fill in the bit
   uint16_t c = TCNT1;                   // catch the time!
 
-  if(bit_is_set(CC1100_IN_PORT,CC1100_IN_PIN)) {
+  if(bit_is_set(CC1100_PINGRP,CC1100_PININ)) {
     TCNT1 = 0;                          // restart timer
     TIFR1 |= _BV(OCF1A);                // clear Timers flags (?, important!)
     rf = RISING_EDGE;

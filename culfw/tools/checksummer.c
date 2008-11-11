@@ -136,9 +136,6 @@ analyze(bucket_t *b, uint8_t t)
 
 
 char *data[] = {
-    // FS20
-    "32994004D215B8",
-
     // ???
     //"4FEF51DEE0",
     //"4FDF51BFE0",
@@ -199,7 +196,7 @@ main(int ac, char *av[])
       px1.data[i/2] = (tohex(s[i])<<4) | tohex(s[i+1]);
     if(i==14) {
       px1.byteidx = 6;
-      px1.bitidx = 1;
+      px1.bitidx = 5;
     } else if(i==20) {
       px1.byteidx = 10;
       px1.bitidx = 7;

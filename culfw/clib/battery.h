@@ -3,6 +3,5 @@
 
 void batfunc(char *unused);
 void bat_init(void);
-void bat_drawstate(void);
 
 #endif

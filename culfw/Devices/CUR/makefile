@@ -106,7 +106,6 @@ SRC = $(TARGET).c                                                  \
 		../clib/menu.c                                     \
 		../clib/battery.c                                  \
 		../clib/joy.c                                      \
-		../clib/mysleep.c                                  \
 		../MyUSB/Scheduler/Scheduler.c                     \
 		../MyUSB/Drivers/USB/LowLevel/LowLevel.c           \
 		../MyUSB/Drivers/USB/LowLevel/Endpoint.c           \
@@ -115,6 +114,7 @@ SRC = $(TARGET).c                                                  \
 		../MyUSB/Drivers/USB/HighLevel/USBInterrupt.c      \
 		../MyUSB/Drivers/USB/HighLevel/Events.c            \
 		../MyUSB/Drivers/USB/HighLevel/StdDescriptors.c    \
+		../Drivers/AT90USB162/SPI.c
 
 
 # List C++ source files here. (C dependencies are automatically generated.)

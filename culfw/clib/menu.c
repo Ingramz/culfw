@@ -11,15 +11,12 @@
 #include "display.h"            // debugging
 #include "joy.h"                // input
 #include "ttydata.h"            // fntab
-#include "battery.h"            // bat_drawstate
-#include "mysleep.h"            // dosleep
 
 #include <avr/eeprom.h>
 
 #define NMENUS     32   // Total number of menu's
 #define NITEMS     32   // Maximum number of subitems in a single menu
-#define MLINESIZE  32   // Length of one menu line (data)
-#define MENUSTACK   8   // Number of recursively called menus
+#define MENUSTACK  8    // Number of recursively called menus
 
 static fs_inode_t minode;
 static uint16_t menu_filelen;
@@ -32,7 +29,7 @@ static uint8_t  menu_curitem;           // Current item in current menu
 static uint8_t  menu_topitem;           // Top visible item in current menu
 static uint8_t  menu_nitems;            // Number of items in the current menu
 static uint8_t  menu_nmenus;            // Number of defined menus
-static uint8_t  menu_cols[5];           // 3x3 nibbles = 4.5 bytes
+static uint8_t  menu_dpy_on = 0xff;
 
 
 static uint16_t menu_get_line(uint16_t offset, uint8_t *buf, uint8_t len);
@@ -68,22 +65,13 @@ menu_init()
   joyfunc = menu_handle_joystick;       // parse input
 }
 
-static void
-menu_setbg(uint8_t row)
-{
-  if(row&1)
-    lcd_setbgcol(menu_cols[1]<<4, menu_cols[2]&0xf0, menu_cols[2]<<4);
-  else
-    lcd_setbgcol(menu_cols[3]&0xf0, menu_cols[3]<<4, menu_cols[4]&0xf0);
-}
-
 
 ///////////////////////////////////////////////
 // Display a menu
 void
 menu_push(uint8_t idx)
 {
-  uint8_t menu_line[MLINESIZE+1], dpybuf[20];
+  uint8_t menu_line[20], dpybuf[20];
   uint16_t off;
 
   menu_stack[menu_stackidx] = idx;
@@ -94,21 +82,10 @@ menu_push(uint8_t idx)
 
   // Title
   off = menu_get_line(menu_offset[idx], menu_line, sizeof(menu_line));
-
-  menu_getlineword(3, menu_line, dpybuf, sizeof(dpybuf));
-  if(dpybuf[0]) {
-    dpybuf[9] = '0'; dpybuf[10] = 0; // fromhex needs an even number of chars
-    fromhex((char *)dpybuf, menu_cols, sizeof(menu_cols));
-  } else {
-    menu_cols[0] = menu_cols[1] = menu_cols[2] = 
-    menu_cols[3] = menu_cols[4] = 0xff;
-  }
-
   menu_getlineword(2, menu_line, dpybuf, sizeof(dpybuf));
   if(!dpybuf[0])
     menu_getlineword(1, menu_line, dpybuf, sizeof(dpybuf));
 
-  lcd_setbgcol(menu_cols[0]&0xf0, menu_cols[0]<<4, menu_cols[1]&0xf0);
   lcd_putline(0, (char *)dpybuf);
 
   menu_item_offset[0] = off;
@@ -131,16 +108,13 @@ menu_push(uint8_t idx)
     menu_topitem = 0;
     menu_curitem = 0;
   } else {
-    if(menu_curitem >= BODY_LINES)
-      menu_topitem = menu_curitem-BODY_LINES/2;
+    if(menu_curitem >= LCD_TEXTROWS)
+      menu_topitem = menu_curitem-LCD_TEXTROWS/2;
     else 
       menu_topitem = 0;
   }
 
-  if(idx == 0)
-    lcd_resetscroll();
-
-  for(uint8_t i = 0; i < BODY_LINES; i++) {
+  for(uint8_t i = 0; i < LCD_TEXTROWS; i++) {
     if(menu_topitem+i < menu_nitems) {
       menu_get_line(menu_item_offset[menu_topitem+i],
                         menu_line, sizeof(menu_line));
@@ -149,12 +123,8 @@ menu_push(uint8_t idx)
     } else {
       dpybuf[0] = 0;         // Clear the rest
     }
-
-    menu_setbg(i);
     lcd_putline(i+1, (char *)dpybuf);
   }
-  if(idx == 0)
-    lcd_drawlogo();
 }
 
 ///////////////////////////////////////////////
@@ -219,7 +189,7 @@ menu_getlineword(uint8_t wordnr, uint8_t *frombuf, uint8_t *tobuf, uint8_t max)
     if(frombuf[0] == '<' && frombuf[3] == '>') {
       uint8_t mnu = menu_stack[menu_stackidx - 1 - (frombuf[1]-'0')];
       uint8_t lnr = eeprom_read_byte((uint8_t *)(EE_START_MENU+mnu))+1;
-      uint8_t line[MLINESIZE+1];
+      uint8_t line[32];
 
       // Read the menu line
       uint16_t off = menu_get_line(menu_offset[mnu], line, sizeof(line));
@@ -262,19 +232,18 @@ menu_getlineword(uint8_t wordnr, uint8_t *frombuf, uint8_t *tobuf, uint8_t max)
 static void
 menu_handle_joystick(uint8_t key)
 {
-  uint8_t menu_line[MLINESIZE+1];
+  uint8_t menu_line[32];
 
   ////////////////////////////////////////
   // Scrolling up/down.
   if(key == KEY_DOWN || key == KEY_UP) {
-    menu_setbg(menu_curitem);
     lcd_putchar(menu_curitem-menu_topitem+1,  ' ');
 
     uint8_t insert_line = 0;
 
     if(key == KEY_DOWN && menu_curitem < menu_nitems-1) {
       menu_curitem++;
-      if(menu_curitem - menu_topitem >= BODY_LINES) {
+      if(menu_curitem - menu_topitem >= LCD_TEXTROWS) {
         menu_topitem++;
         insert_line = 9;
       }
@@ -288,14 +257,12 @@ menu_handle_joystick(uint8_t key)
       }
     }
 
-    menu_setbg(menu_curitem);
     if(insert_line) {
       uint8_t dpybuf[17];
       menu_get_line(menu_item_offset[menu_curitem],
                         menu_line, sizeof(menu_line));
       menu_getlineword(1, menu_line, dpybuf+1, sizeof(dpybuf)-1);
       dpybuf[0] = ' ';
-
       lcd_putline(insert_line, (char *)dpybuf);
     }
     lcd_putchar(menu_curitem-menu_topitem+1, '>');
@@ -344,15 +311,19 @@ menu_handle_joystick(uint8_t key)
   // Switch display on / off
   if(key == KEY_ENTER) {
 
-    if(lcd_on) {
-      if(lcd_on == 0xff) {
+    if(menu_dpy_on) {
+      if(menu_dpy_on == 0xff) {
         lcdfunc("dff02FC");     // on + clear screen + set last contrast
         menu_stackidx = 0;
         menu_push(0);
-      } else {
-        dosleep();
-      }
+        menu_dpy_on = 0;
+      } else
+        lcdfunc("dff00");
+    } else {
+      lcdfunc("dff01ff");
     }
-    bat_drawstate();
+
+    menu_dpy_on = (menu_dpy_on ? 0 : 1);
+
   }
 }

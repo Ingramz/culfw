@@ -8,7 +8,6 @@ void prepare_b(char *);
 void prepare_B(char *);
 void version(char *);
 void lcdout(char *in);
-void timer(char *in);
 
 /* See the README for doc */
 

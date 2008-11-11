@@ -6,12 +6,7 @@
 #include <MyUSB/Scheduler/Scheduler.h> // Simple scheduler for task management
 
 void joy_init(void);
-void joy_enable_interrupts(void);
-void joy_disable_interrupts(void);
-
 extern void (*joyfunc)(uint8_t);
-extern uint8_t joy_inactive;
-
 TASK(JOY_Task);
 
 #define KEY_NONE  0
