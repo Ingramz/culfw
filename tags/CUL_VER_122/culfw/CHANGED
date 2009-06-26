@@ -1,0 +1,112 @@
+Version 1.22 (Tue Jun 26 2009)
+- CU*: HMS support
+- CUR: V3 board support
+
+Version 1.21 (Tue Jun 02 2009)
+- CU*: FHT protocol filtering flag (X64)
+- CUL: CUL 433 initialization
+
+Version 1.20 (Sun May 31 13:26:31 MEST 2009)
+- CU*: FHT buffers moved from EEPROM to RAM, with better buffer usage
+       There are 2 memory models, the default is more RAM efficient but needs
+       ca 200bytes more of program memory.
+
+Version 1.19 (Sat May 16 13:19:12 MEST 2009)
+- CUR: menu wraparound
+- CU*: FHT80b communication (no resend yet). TODO: FHT time sync
+- CUL: bugfix: jumping to bootloader works now.
+
+Version 1.18
+- CUL: former bugfix got lost in Check-In procedure
+
+Version 1.17
+- CUR: battery "line" calibrated
+- CUR: enable radio correctly after wakeup
+- CUL: bugfix: EE_LED wrapped on CUL to 0x2, overwriting CC1100 config
+
+Version 1.16
+- CUR: syslog (with logrotate)
+- qfs: fs_rename, fs_read bugfix
+- CUR: "more" (file viewing)
+- CUR: display internally selectable (log/USB/LCD)
+- CUR: reading files longer than 2 sec does not triggers the watchdog
+- CUR: menu "last selected item" is kept in the RAM instead of EEPROM
+- fromhex() fixed: it now only ignores ' ' instead of all non-hex characters
+- CUR: added picture loading from file (P)
+- CUR: builtin logo replaced with a loadable one (each menu can have one)
+- CUR: battery calibrated (get the original values with a01)
+
+Version 1.13
+- Fixed sending longer FS20 messages (for CUR/CUL communication)
+- CUR: Status request from fhem:00_CUL.pm for FS20/FHT/EM/S300 devices
+
+Version 1.12
+- further fht experiments
+
+Version 1.11
+- sending should work now
+- first fht experiments
+
+Version 1.11
+- CUR: Control menu reorganized
+- CUR: Display "stdout" on the title
+- CUR: dpy off if connected to usb (real sleep else)
+- even more pa tables
+
+Version 1.10
+- CUR: RTC
+
+Version 1.09 (Wed Dec 10 00:13:21 MET 2008)
+- multiple PA tables: x02
+- reboot command changed (B00/B01 vs. b/B)
+- init cc1101 when sending before receive 
+- factory reset changed. Function call instead of writing a magic eeprom byte
+- eeprom magic and version number: all eeprom adresses changed
+- CUR: set X00 for file operations
+- CUR: battery: display red line if not on USB
+- "Upgrade" to 1.5.3: no files changed -> no difference
+
+Version 1.08 (Wed Nov 12 07:42:45 MET 2008)
+- cc1100.c: sending works again (reset to factory!)
+- CUR: command feedback in the menu
+- CVS tag CUL_VER_108
+
+Version 1.07 (Sat Nov  8 17:54:58 MET 2008)
+- cc1100.c: abort ccTX / ccRX if 255 tries did not worked.
+- CUR: 5-fold speedup in display data transfer using HW SPI
+- CUR: display battery state on the lcd
+- CUR: LED is inverse
+- CUR: Add some color to the menus
+- CUR: Intro logo
+
+Version 1.06 (Sun Nov  2 17:45:47 MET 2008)
+- CUR: menu implementation
+- CUR: joystick support
+- CVS tag CUL_VER_106
+
+Version 1.05 (Sun Oct 26 15:22:16 MET 2008)
+- USB output routines more stable now.
+- CUR: display routine (command d), with antialiased fonts, scrolling
+- CUR: battery check (command a)
+- CUR: Filesystem: qfs. Command r/w to read/write files. tools/cur_file.pl
+- CVS tag CUL_VER_105
+
+Version 1.04 (Sun Oct 12 11:24:02 MEST 2008)
+- l command added (CUL/CUR)
+- L / s command (CUR). Note, s is experimental and will go away.
+- Accepting half-byte S300 messages
+- various small fixes
+- MyUSB update
+- r command (sending raw data)
+
+Version 1.03
+- File reorganization to accomodate CUR and other projects
+
+Version 1.02
+- Version string will be updated manually
+- R/W can take one or two bytes as address.
+- Factory reset byte moved to 0x1FF
+- PATABLE changed to transmit "louder" (+10dB, no PA ramping)
+- Recalibrating every 2 minutes (busy for 1ms, less than 0.01%)
+- Factory defaults chenged to measured optimum.
+
