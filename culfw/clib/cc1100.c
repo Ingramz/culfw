@@ -319,20 +319,17 @@ ccreg(char *in)
 uint8_t
 cc1100_readReg(uint8_t addr)
 {
-  CC1100_ASSERT;
-  cc1100_sendbyte( addr|CC1100_READ_BURST );
-  uint8_t ret = cc1100_sendbyte( 0 );
-  CC1100_DEASSERT;
-  return ret;
+  return cc1100_writeReg(addr, 0);
 }
 
-void
+uint8_t
 cc1100_writeReg(uint8_t addr, uint8_t data)
 {
   CC1100_ASSERT;
-  cc1100_sendbyte( addr|CC1100_WRITE_BURST );
-  cc1100_sendbyte( data );
+  cc1100_sendbyte( addr|CC1100_READ_BURST );
+  uint8_t ret = cc1100_sendbyte( data );
   CC1100_DEASSERT;
+  return ret;
 }
 
 
