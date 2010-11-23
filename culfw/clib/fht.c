@@ -437,15 +437,11 @@ static uint8_t*
 fht_lookbuf(uint8_t *buf)
 {
   uint8_t *p = fht80b_buf;
-  uint8_t *bmax = fht80b_buf+FHTBUF_SIZE;
-
-  while(p[0] && p < bmax) {
+  while(p[0] && p < (fht80b_buf+FHTBUF_SIZE)) {
     if(buf != 0 && p[1] == buf[0] && p[2] == buf[1])
       return p;
     p += p[0];
   }
-  if(p > bmax)
-    p = bmax;
   return (buf ? 0 : p);
 }
 

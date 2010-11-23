@@ -3,7 +3,6 @@
 #include "uip_arp.h"            // uip_arp_out;
 #include "drivers/interfaces/network.h"            // network_send
 #include "delay.h"
-#include <avr/eeprom.h>
 
 #include <string.h>
 #include <stdlib.h>
@@ -11,6 +10,7 @@
 #include "board.h"
 #include "version.h"
 #include "ringbuffer.h"
+#include "cdc.h"
 #include "display.h"
 #include "tcplink.h"
 #include "fncollection.h"

@@ -6,7 +6,7 @@ License: GPL v2
 These gadgets all feature one or more CC1101 transceiver and an Atmel MCU, so
 the can be used for low-power wireless communication in the 868 band.
 
-- The CUL (CC110x USB Light) has one CC1101 and an AT90USB162/ATMEGA32U4 MCU.
+- The CUL (CC110x USB Light) has one CC1101 and an AT90USB162 MCU.
   See http://busware.de/tiki-index.php?page=CUL for details and on how to buy
   it.
 
@@ -17,11 +17,8 @@ the can be used for low-power wireless communication in the 868 band.
   AT90USB1287 / Ethernet interface / 16Mbit flash / 256Kbit SRAM / MicroSD
 
 - The CSM (CC110x Serial Module) is a device you talk to a serial way using a
-  host system with an USART available. 1.8V-3.3V, CC1101 / ATMEGA324/644/1284(P)
-
-- The CUNO (CC110x USB Network OneWire) is a device with following features: 
-  CSM == CC1101+ATMega m644/m1284 cpu / Ethernet interface w/ PoE /
-  ACM-USB bridge / OneWire Bus-Master DS2482 / MicroSD
+  host system with an USART available.
+  I/O lines are 3.3V or 5V safe - ATMEGA88/168/328(P)
 
 This firmware makes it possible to use these devices with fhem. Right now the
 following RF protocols are supported:
@@ -33,8 +30,6 @@ following RF protocols are supported:
 - ESA
 - ASKSIN (aka BidCos(R))
 
-Additionally CUNO supports the basic OneWire Protocol through the DS4282
-
 Thanks to the MyUSB project (http://www.fourwalledcubicle.com/MyUSB.php, ) the
 device/firmware combination confirms to the Universal Serial Bus Communication
 Device Class Abstract Control Model (USB CDC ACM) specification, so it can be
@@ -45,21 +40,13 @@ Prerequisites
 =============
   You'll need following packets to install the firmware (in paranthesis is the
   version of the corresponding packet for my installation):
-  CUL/CUN/CUR
-  - dfu-programmer (0.4.4) on Linux
-    flip on Windows
-  CUNO
-  - avrdude (5.10)
+  - dfu-programmer (0.4.4)
 
   If you want to modify the firmware:
   - avr-libc       (1.6.2 / 1.6.7)
   - binutils-avr   (2.18 / 2.20)
   - gcc-avr        (4.3.0 / 4.3.4)
-
   Ubuntu: "apt-get install avr-libc" will install all three packages
-  OSX: install CrossPack-AVR (version 20100115 works for me).
-       dfu-programmer came with the ports pckage.
-  Windows: avrdude is part of WINAVR.
 
 
 Compile (optional)
@@ -74,23 +61,20 @@ Install / Flash the firmware
 ============================
   Change into your device directory (e.g. Devices/CUL)
   - CUL/CUN: Insert the USB-Stick while pressing the micro-switch on the back.
-    A USB device "03eb:2ffa Atmel Corp." should appear.
-    Now execute "make usbprogram", which will output text like:
-      dfu-programmer at90usb162 erase
-      dfu-programmer at90usb162 flash CUL.hex
-      Validating...
-      6312 bytes used (51.37%)
-      dfu-programmer at90usb162 start
-    The last command will reset the device, a new USB device should appear:
-    "03eb:204b Atmel Corp.". If not try to reinsert the CUL without pressing
-    the micro-switch.
+  - CUR: Remove Battery/USB. Put the device on a table with the jogdial facing
+         down. Press the case, until you hear the jogdial is pressed. Insert
+         the battery, then the USB-Cable.
 
-  - CUNO:
-    - configure the COM-Port/serial device by which CUNO will be connected
-      (/dev/ttyACM0, or COMx) in the file Devices/CUNO/makefile, look for
-      AVRDUDE_PORT
-    - insert the USB-Cable while pressing the micro-switch on the back.
-    - execute "make program"
+  A USB device "03eb:2ffa Atmel Corp." should appear.
+  Now execute "make usbprogram", which will output text like:
+    dfu-programmer at90usb162 erase
+    dfu-programmer at90usb162 flash CUL.hex
+    Validating...
+    6312 bytes used (51.37%)
+    dfu-programmer at90usb162 start
+  The last command will reset the device, a new USB device should appear:
+  "03eb:204b Atmel Corp.". If not try to reinsert the CUL without pressing
+  the micro-switch.
 
 Quick Test:
 ===========
@@ -102,9 +86,6 @@ Quick Test:
     "usbserial vendor=0x03eb product=0x204b" to modprobe.conf.
 
     Connect to the device e.g. with "screen /dev/ttyACM0".
-    
-    CUNO:
-    Connect to the device e.g. with "screen /dev/ttyACM0@38400".
 
   Windows
   =======
@@ -112,13 +93,8 @@ Quick Test:
     directory. Locate the COM-port in the device manager shown as
     "USB Virtual Serial Port (COMx)". Start Hyperterminal, open a connection
     to COMx 9600,8,n,1.
-    
-    For CUNO: Install a virtual COM port, use MCP2200.inf from the docs
-    directory. Locate the COM-port in the device manager shown as
-    "USB Virtual Serial Port (COMx)". Start Hyperterminal, open a connection
-    to COMx 38400,8,n,1.
 
-  CUN/CUNO: Connect the device to a network with a DHCP server, and then telnet to
+  CUN: Connect the device to a network with a DHCP server, and then telnet to
   the assigned address with "telnet <ip-adress> 2323"
 
   Type "V<return>". The string "V 1..." should appear. Type X21<return> to
@@ -234,7 +210,6 @@ culfw<->PC Protocol (over USB or TCP/IP)
       First switch both devices to fastrf mode with "fr", then send data:
       fs<data>, e.g. fsHallo
       Reset to "SlowRF": fx, followed by X21
-      It can be used to "sniff" RFR packets
 
     F<hex>
       Send out an FS20 message. <hex> is a hex string of the following form:
@@ -244,21 +219,6 @@ culfw<->PC Protocol (over USB or TCP/IP)
       - cc is the FS20 command
       - ee is the FS20 timespec. Note that cc must have the extension bit set.
       Example: F12340111
-
-    GssNnprHHLLhhllDDDD...
-      Send raw data, only if HAS_RAWSEND is enabled.
-      - Everything after the command G is hex.
-      - ss Number of sync bits. Sync is always 0, followed by exactly one 1-bit.
-      - N  Number of data bytes (exclusive the last byte if it is not complete)
-      - n  Number of bits in the last byte
-      - p  Number of ms pause between repeats
-      - r  Number of repeats (e.g. FS20: 3)
-      - HH High-Time for the 0-bit, Unit is 16us (!)
-      - LL Low- Time for the 0-bit, Unit is 16us (!)
-      - hh High-Time for the 1-bit, Unit is 16us (!)
-      - ll Low- Time for the 1-bit, Unit is 16us (!)
-      - DDDDD... Databytes
-      See also X04
 
     M<hex>
       Send out an EM message. <hex> is a hex string of the following form:
@@ -276,60 +236,6 @@ culfw<->PC Protocol (over USB or TCP/IP)
       - 00: Set LED off
       - 01: Set LED on
       - 02: The LED will blink once a second
-
-    O<func> OneWire Command-Set
-      (CUNO only)
-      <func> is one of the following:
-      - i  - Initialize OneWire Sub-System; Reset HMS-Emulation & Timers
-      
-      - R<func>	   Reset Routines:
-      	-b	- Reset OneWire Bus; Returns:
-      					0 - No Device connected
-      					1 - One or more Devices connected
-      					2 - Short detected on OneWire Bus
-      	-m	- Reset OneWire Master (DS2482-Chip); Returns:
-      					OK - Chip Resetted
-      					FAILED I2C - DS2482 Chip can't be reached via I2C internal Bus
-      					
-      - c  - Returns list of found RomCodes for OneWire Devices 
-      			 (based on OneWire FullSearch, performed during boot, or with 
-      			  Of-Command)
-      			 Output: 1:aabbccddeeffgghh  where a-h are Hex-Values: 64Bit Address
-      						   2:aabbccddeeffgghh 
-      						   
-      - w<func>    Write Routines
-        -b<hex> - Write one BIT to the OneWire Bus; <hex>: 00, or >00 otherwise
-        -B<hex> - Write one BYTE to the OneWire Bus; <hex>:dd Hex-Value of Data
-
-      - r<func>    Read Routines
-        -b			 - Read one BIT from the OneWire Bus; Return: 
-        					  <hex>: 00, or 01 otherwise
-        -B 			 - Read one BYTE from the OneWire Bus; Return:
-                    <hex>:dd Hex-Value of Data
-        
-      - m<hex> - MatchRom Code to select Device; <hex>:64-Bit Address in 8xHEX
-      
-      - H<func>   HMS Emulation Routines for Temp-Sensors (DS18B20 & DS18S20)
-        -o        - Toggle HMS-Emulation on/off; Returns: ON / OFF
-        				    Based on found RomCodes an HMS Emulation will be done for 
-        				    OW-Temp-Sensors DS18B20 & DS18S20
-        -t<dec>   - Set Time-Interval for HMS-emulated Reporting
-                    <dec>: Seconds in decimal: 0-255
-                    default: 120s
-                   
-      -C<func>    Sensor-Conversion Routines
-       -s         - Start Asynchronous Conversion for a selected Sensor (MatchRom)
-       -r         - Checks if an asynchronous conversion is still running; Returns:
-                    1 - Conversion still running
-                    0 - Conversion finished
-       -a         - Checks if Conversion Slot for ALL Sensors is still running;
-                    This is used for HMS-Emulation, as all Sensors go to conversion
-                    at the same time; Returns:
-                    1 - Conversion still running
-                    0 - Conversion finished
-                    
-       -f     - Start a new RomCode Full Search on the OW-Bus
-      	
 
     P<hex><filename>
       (CUR only)
@@ -405,8 +311,6 @@ culfw<->PC Protocol (over USB or TCP/IP)
       - T02
         Return the FHT80b buffer. FHT80b commands are queued in the internal
         buffer, which has place for 14 to 31 messages.
-	A command is removed from the buffer after CUL has received the
-	acknowledgement from FHT80b.
       - T03
         Return the size of the remaining FHT80b buffer (bytes, hex).
       - T10
@@ -676,12 +580,6 @@ Notes
 - Repeat-filter
   The FS20 protocol sends each message 3 times. The firmware filters optionally
   (See Command X bit 1) repeated messages.
-  
-- CUNO via USB
-  The USB-Bridge of CUNO operates on 38400 Baud. This means, that you have to
-  assign this speed to the port in your host OS.
-  Typically you use CUNO via /dev/ttyACM0@38400.
-  This sets the speed to 38400 on the port.
 
 - cc1100 settings. See cc1100.h / official PDF from TI  for details.
   - Change receiver sensitivity / target amplitude
@@ -722,8 +620,8 @@ Notes
     MARCSTATE: C35 -> 01 (Idle), 13 (RX)
 
 
-Sample CUN(O) setup
-====================
+Sample CUN setup
+================
 
 This section describes how to setup CUN for ethernet access with the following
 settings:
@@ -736,8 +634,7 @@ Time zone offset:	GMT+2
 
 Connect CUN to your PC via USB. On Linux a device /dev/ttyACM0 will appear (on
 subsequent experiments, the device may be named /dev/ttyACM1, /dev/ttyACM2 and
-so forth). Use screen /dev/ttyACM1 to talk to CUN and screen /dev/ttyACM1@38400 
-for CUNO. Enter the following commands:
+so forth). Use screen /dev/ttyACM1 to talk to CUN. Enter the following commands:
 
 V			output version, e.g. V 1.39 CUN
 Wid00			disable DHCP
