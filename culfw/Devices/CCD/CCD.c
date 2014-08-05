@@ -55,6 +55,10 @@
 #include "intertechno.h"
 #endif
 
+#ifdef HAS_KOPP_FC
+#include "kopp-fc.h"
+#endif
+
 const PROGMEM t_fntab fntab[] = {
 
   { 'm', getfreemem },
@@ -78,6 +82,9 @@ const PROGMEM t_fntab fntab[] = {
 #endif
 #ifdef HAS_DOGM
   { 'D', dogm_func },
+#endif
+#ifdef HAS_KOPP_FC
+  { 'K', kopp_fc_func },
 #endif
 #ifdef HAS_ONEWIRE
   { 'O', onewire_func },
@@ -186,6 +193,10 @@ main(void)
 #ifdef HAS_MORITZ
     rf_moritz_task();
 #endif
+//#ifdef HAS_KOPP_FC
+//    kopp_fc_task();
+// #endif
+
   }
 
 }
