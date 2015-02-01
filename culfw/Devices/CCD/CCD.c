@@ -84,7 +84,7 @@ const PROGMEM t_fntab fntab[] = {
   { 'D', dogm_func },
 #endif
 #ifdef HAS_KOPP_FC
-  { 'K', kopp_fc_func },
+  { 'k', kopp_fc_func },
 #endif
 #ifdef HAS_ONEWIRE
   { 'O', onewire_func },
