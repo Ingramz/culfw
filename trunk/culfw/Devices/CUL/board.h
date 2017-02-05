@@ -67,6 +67,7 @@
 #  undef HAS_KOPP_FC
 #  undef HAS_RFNATIVE
 #  define LACROSSE_HMS_EMU              // PROGMEM: 2206
+#  define HAS_EVOHOME
 #endif
 
 
