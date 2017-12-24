@@ -46,7 +46,7 @@
 
 /*
  * Board definition according to
- * http://www.seeedstudio.com/depot/datasheet/RFBee%20User%20Manual%20v1.1.pdf
+ * https://github.com/SeeedDocument/RFbee_V1.1-Wireless_Arduino_compatible_node/raw/master/res/rfbee-manual.pdf
  */
 
 #define SPI_PORT		PORTB
