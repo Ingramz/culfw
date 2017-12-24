@@ -146,7 +146,7 @@ int
 main(void)
 {
   wdt_enable(WDTO_2S);
-  clock_prescale_set(clock_div_1);
+  clock_prescale_set(clock_div_2);
 
   // Setup the timers. Are needed for watchdog-reset
   OCR0A  = 249;                            // Timer0: 0.008s = 8MHz/256/250
@@ -163,7 +163,7 @@ main(void)
   spi_init();
   eeprom_init();
 #ifdef HAS_UART
-  uart_init( UART_BAUD_SELECT_DOUBLE_SPEED(UART_BAUD_RATE,F_CPU) );
+  uart_init( UART_BAUD_SELECT(UART_BAUD_RATE,F_CPU) );
 #endif
   fht_init();
   tx_init();
