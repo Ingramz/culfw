@@ -13,26 +13,27 @@
 
 #include <string.h>
 
+#ifdef HAS_UART
+#include "serial.h"
+#endif
+
 #include "spi.h"
 #include "cc1100.h"
 #include "clock.h"
 #include "delay.h"
 #include "display.h"
 #include "fncollection.h"
-#include "led.h"    // ledfunc
+#include "led.h"		// ledfunc
 #include "ringbuffer.h"
 #include "rf_receive.h"
-#include "rf_send.h"    // fs20send
+#include "rf_send.h"		// fs20send
 #include "ttydata.h"
-#include "fht.h"    // fhtsend
-#include "fastrf.h"    // fastrf_func
-#include "rf_router.h"    // rf_router_func
-#ifdef HAS_UART
-#include "serial.h"
-#endif
+#include "fht.h"		// fhtsend
+#include "fastrf.h"		// fastrf_func
+#include "rf_router.h"		// rf_router_func
 
 #ifdef HAS_MEMFN
-#include "memory.h"    // getfreemem
+#include "memory.h"		// getfreemem
 #endif
 #ifdef HAS_ASKSIN
 #include "rf_asksin.h"
@@ -67,6 +68,7 @@
 #ifdef HAS_EVOHOME
 #include "rf_evohome.h"
 #endif
+
 
 const PROGMEM t_fntab fntab[] = {
 
@@ -176,6 +178,7 @@ main(void)
 #endif
 
   LED_OFF();
+
   sei();
 
   for(;;) {
