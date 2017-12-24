@@ -92,7 +92,7 @@ OBJ = $(SRC:%.c=$(OBJDIR)/%.o)
 
 all:
 	make TARGET=RFbee11 MCU=atmega168 mostly_clean build size
-	make TARGET=RFbee12 MCU=atmega328 mostly_clean build size
+	make TARGET=RFbee12 MCU=atmega328p mostly_clean build size
 
 build: elf hex eep lss sym
 
@@ -116,7 +116,7 @@ program11: $(TARGET).hex
 	TARGET=RFbee11 AVRDUDE_PART=m168 $(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)
 
 program12: $(TARGET).hex
-	TARGET=RFbee12 AVRDUDE_PART=m328 $(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)
+	TARGET=RFbee12 AVRDUDE_PART=m328p $(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)
 
 %.hex: %.elf
 	@echo $(MSG_FLASH) $@
