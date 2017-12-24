@@ -2,13 +2,15 @@
 #define _BOARD_H
 
 #if defined(RFbee12)
-#define BOARD_ID_STR            "RFbee V1.2"
-#define BOARD_ID_USTR           L"RFbee V1.2"
+#  define BOARD_ID_STR            "RFbee V1.2"
+#  define BOARD_ID_USTR           L"RFbee V1.2"
+#elif defined(RFbee11)
+#  define BOARD_ID_STR            "RFbee V1.1"
+#  define BOARD_ID_USTR           L"RFbee V1.1"
 #endif
-#if defined(RFbee11)
-#define BOARD_ID_STR            "RFbee V1.1"
-#define BOARD_ID_USTR           L"RFbee V1.1"
-#endif
+
+#define HAS_UART
+#define UART_BAUD_RATE          38400
 
 #define HAS_FHT_80b                     // PROGMEM: 1374b, RAM: 90b
 #define HAS_RF_ROUTER                   // PROGMEM: 1248b  RAM: 44b
@@ -29,31 +31,30 @@
 #define HAS_TX3                       // PROGMEM:  168
 #define HAS_TCM97001                  // PROGMEM:  264
 
-#if defined(RFbee11)
-#undef  HAS_ESA
-#undef  HAS_INTERTECHNO
-#undef  HAS_RWE
-#undef  HAS_MEMFN
-#define TTY_BUFSIZE		104
-#endif
 #if defined(RFbee12)
-#define RFR_FILTER                      // PROGMEM:   90b  RAM:  4b
-#define HAS_HOERMANN_SEND               // PROGMEM:  220
-#define HAS_FHT_TF
-#define HAS_ESA                       // PROGMEM:  286
-#define HAS_INTERTECHNO               // PROGMEM: 1352
-#define HAS_UNIROLL                   // PROGMEM:   92
-#define HAS_MEMFN                     // PROGMEM:  168
-#define HAS_SOMFY_RTS                 // PROGMEM: 1716
-#define HAS_BELFOX                    // PROGMEM:  214
-#define HAS_ZWAVE                     // PROGMEM:  882
-#define TTY_BUFSIZE          128      // RAM: TTY_BUFSIZE*4
-#define HAS_MBUS                      // PROGMEM: 2536
-#define MBUS_NO_TX                       // PROGMEM:  962
-#define HAS_RFNATIVE                  // PROGMEM:  580
-#define HAS_KOPP_FC                   // PROGMEM: 3370
-#define HAS_ZWAVE                     // PROGMEM:  882
-#define LACROSSE_HMS_EMU              // PROGMEM: 2206
+#  define RFR_FILTER                      // PROGMEM:   90b  RAM:  4b
+#  define HAS_HOERMANN_SEND               // PROGMEM:  220
+#  define HAS_FHT_TF
+#  define HAS_ESA                       // PROGMEM:  286
+#  define HAS_INTERTECHNO               // PROGMEM: 1352
+#  define HAS_UNIROLL                   // PROGMEM:   92
+#  define HAS_MEMFN                     // PROGMEM:  168
+#  define HAS_SOMFY_RTS                 // PROGMEM: 1716
+#  define HAS_BELFOX                    // PROGMEM:  214
+#  define HAS_ZWAVE                     // PROGMEM:  882
+#  define TTY_BUFSIZE          128      // RAM: TTY_BUFSIZE*4
+#  define HAS_MBUS                      // PROGMEM: 2536
+#  define MBUS_NO_TX                       // PROGMEM:  962
+#  define HAS_RFNATIVE                  // PROGMEM:  580
+#  define HAS_KOPP_FC                   // PROGMEM: 3370
+#  define HAS_ZWAVE                     // PROGMEM:  882
+#  define LACROSSE_HMS_EMU              // PROGMEM: 2206
+#elif defined(RFbee11)
+#  undef  HAS_ESA
+#  undef  HAS_INTERTECHNO
+#  undef  HAS_RWE
+#  undef  HAS_MEMFN
+#  define TTY_BUFSIZE		104
 #endif
 
 // No features to define below
@@ -89,7 +90,4 @@
 #define LED_PORT              PORTD
 #define LED_PIN               PD6
 
-#define HAS_UART
-#define UART_BAUD_RATE          38400
-
-#endif
+#endif // __BOARD_H__
