@@ -1,11 +1,11 @@
 #ifndef _BOARD_H
 #define _BOARD_H
 
-#ifdef(RFbee12)
+#if defined(RFbee12)
 #define BOARD_ID_STR            "RFbee V1.2"
 #define BOARD_ID_USTR           L"RFbee V1.2"
 #endif
-#ifdef(RFbee11)
+#if defined(RFbee11)
 #define BOARD_ID_STR            "RFbee V1.1"
 #define BOARD_ID_USTR           L"RFbee V1.1"
 #endif
@@ -29,14 +29,14 @@
 #define HAS_TX3                       // PROGMEM:  168
 #define HAS_TCM97001                  // PROGMEM:  264
 
-#ifdef(RFbee11)
+#if defined(RFbee11)
 #undef  HAS_ESA
 #undef  HAS_INTERTECHNO
 #undef  HAS_RWE
 #undef  HAS_MEMFN
 #define TTY_BUFSIZE		104
 #endif
-#ifdef(RFbee12)
+#if defined(RFbee12)
 #define RFR_FILTER                      // PROGMEM:   90b  RAM:  4b
 #define HAS_HOERMANN_SEND               // PROGMEM:  220
 #define HAS_FHT_TF
