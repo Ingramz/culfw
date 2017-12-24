@@ -41,7 +41,6 @@
 #define HAS_KOPP_FC                   // PROGMEM: 3370
 #define HAS_ZWAVE                     // PROGMEM:  882
 #define LACROSSE_HMS_EMU              // PROGMEM: 2206
-#define HAS_EVOHOME
 
 // No features to define below
 

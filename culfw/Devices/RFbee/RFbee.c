@@ -27,6 +27,9 @@
 #include "fht.h"    // fhtsend
 #include "fastrf.h"    // fastrf_func
 #include "rf_router.h"    // rf_router_func
+#ifdef HAS_UART
+#include "serial.h"
+#endif
 
 #ifdef HAS_MEMFN
 #include "memory.h"    // getfreemem
@@ -159,7 +162,9 @@ main(void)
   led_init();
   spi_init();
   eeprom_init();
-  uart_init(UART_BAUD_SELECT_DOUBLE_SPEED(UART_BAUD_RATE,F_CPU));
+#ifdef HAS_UART
+  uart_init( UART_BAUD_SELECT_DOUBLE_SPEED(UART_BAUD_RATE,F_CPU) );
+#endif
   fht_init();
   tx_init();
   input_handle_func = analyze_ttydata;
