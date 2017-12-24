@@ -13,10 +13,6 @@
 
 #include <string.h>
 
-#ifdef HAS_UART
-#include "serial.h"
-#endif
-
 #include "spi.h"
 #include "cc1100.h"
 #include "clock.h"
@@ -69,6 +65,9 @@
 #include "rf_evohome.h"
 #endif
 
+#ifdef HAS_UART
+#include "serial.h"
+#endif
 
 const PROGMEM t_fntab fntab[] = {
 
