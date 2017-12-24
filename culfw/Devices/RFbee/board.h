@@ -46,6 +46,7 @@
 #undef  HAS_INTERTECHNO
 #undef  HAS_RWE
 #undef  HAS_MEMFN
+#define TTY_BUFSIZE		104
 
 // No features to define below
 
