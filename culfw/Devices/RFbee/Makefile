@@ -1,31 +1,41 @@
-MCU = atmega168
 F_CPU = 8000000
 FORMAT = ihex
-TARGET = RFbee
 OBJDIR = .
 
-SRC = $(TARGET).c                                                    \
+SRC =           RFbee.c\
 		../../clib/cc1100.c                                  \
 		../../clib/cc1101_pllcheck.c                         \
 		../../clib/clock.c                                   \
+		../../clib/belfox.c                                  \
 		../../clib/delay.c                                   \
 		../../clib/display.c                                 \
 		../../clib/stringfunc.c                              \
 		../../clib/fncollection.c                            \
 		../../clib/ringbuffer.c                              \
 		../../clib/rf_send.c                                 \
-		../../clib/rf_asksin.c                               \
-		../../clib/rf_moritz.c                               \
-		../../clib/rf_rwe.c                                  \
 		../../clib/rf_receive.c                              \
 		../../clib/rf_router.c                               \
-        ../../clib/intertechno.c                             \
+		../../clib/rf_asksin.c                               \
+                ../../clib/rf_evohome.c                              \
+		../../clib/rf_moritz.c                               \
+		../../clib/rf_rwe.c                                  \
+		../../clib/rf_native.c                               \
+		../../clib/rf_zwave.c                                \
+		../../clib/intertechno.c                             \
+		../../clib/somfy_rts.c    			     \
+		../../clib/kopp-fc.c				     \
 		../../clib/fht.c                                     \
 		../../clib/fastrf.c                                  \
-		../../clib/memory.c                                  \
-		../../clib/serial.c                                  \
 		../../clib/ttydata.c                                 \
 		../../clib/spi.c                                     \
+		../../clib/memory.c                                  \
+		../../clib/lacrosse.c                                \
+		../../clib/serial.c                                  \
+		../../clib/rf_mbus.c                                 \
+		../../clib/mbus/manchester.c                         \
+		../../clib/mbus/3outof6.c                            \
+		../../clib/mbus/mbus_packet.c                        \
+		../../clib/mbus/crc.c                                \
 
 CFLAGS  = -D$(TARGET)
 CFLAGS += -DF_CPU=$(F_CPU)UL
@@ -49,14 +59,14 @@ ALL_CFLAGS = -mmcu=$(MCU) -I. $(CFLAGS) $(GENDEPFLAGS)
 
 EXTMEMOPTS =
 LDFLAGS = -Wl,-Map=$(TARGET).map,--cref
-LDFLAGS += -Wl,--relax 
+LDFLAGS += -Wl,--relax
 LDFLAGS += -Wl,--gc-sections
 LDFLAGS += $(EXTMEMOPTS)
 
 AVRDUDE_PROGRAMMER = arduino -b 19200
 AVRDUDE_PORT = /dev/ttyUSB0
 AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
-AVRDUDE_FLAGS = -p m168 -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER)
+AVRDUDE_FLAGS = -p $(AVRDUDE_PART) -P $(AVRDUDE_PORT) -c $(AVRDUDE_PROGRAMMER)
 
 CC = avr-gcc
 OBJCOPY = avr-objcopy
@@ -81,7 +91,9 @@ MSG_CLEANING = Cleaning project:
 OBJ = $(SRC:%.c=$(OBJDIR)/%.o)
 
 
-all: mostly_clean build size
+all:
+	make TARGET=RFbee11 MCU=atmega168 mostly_clean build size
+	make TARGET=RFbee12 MCU=atmega328 mostly_clean build size
 
 build: elf hex eep lss sym
 
@@ -98,37 +110,14 @@ size:
 	@if test -f $(TARGET).elf; then echo $(MSG_SIZE); $(ELFSIZE); \
 	2>/dev/null; echo; fi
 
+program:
+	@echo 'specify one of: program11 program12'
 
-program: $(TARGET).hex
-	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)
+program11: $(TARGET).hex
+	TARGET=RFbee11 AVRDUDE_PART=m168 $(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)
 
-usbprogram:
-	@echo 'specify one of: usbprogram_v2 usbprogram_v2_hm usbprogram_v3 usbprogram_v4'
-
-usbprogram_v4: TARGET=CUL_V4
-usbprogram_v4: MCU=atmega32u2
-usbprogram_v4: do_usbprogram
-
-usbprogram_v3: TARGET=CUL_V3
-usbprogram_v3: MCU=atmega32u4
-usbprogram_v3: do_usbprogram
-
-usbprogram_v2: TARGET=CUL_V2
-usbprogram_v2: MCU=at90usb162
-usbprogram_v2: do_usbprogram
-
-usbprogram_v2_hm: TARGET=CUL_V2_HM
-usbprogram_v2_hm: MCU=at90usb162
-usbprogram_v2_hm: do_usbprogram
-
-usbprogram_v2_max: TARGET=CUL_V2_MAX
-usbprogram_v2_max: MCU=at90usb162
-usbprogram_v2_max: do_usbprogram
-
-do_usbprogram:
-	dfu-programmer $(MCU) erase || true
-	dfu-programmer $(MCU) flash $(TARGET).hex
-	dfu-programmer $(MCU) start
+program12: $(TARGET).hex
+	TARGET=RFbee12 AVRDUDE_PART=m328 $(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH)
 
 %.hex: %.elf
 	@echo $(MSG_FLASH) $@
@@ -158,7 +147,7 @@ do_usbprogram:
 
 $(OBJDIR)/%.o : %.c
 	@echo $(MSG_COMPILING) $<
-	@$(CC) -c $(ALL_CFLAGS) $< -o $@ 
+	@$(CC) -c $(ALL_CFLAGS) $< -o $@
 
 mostly_clean:
 	@echo $(MSG_CLEANING)
