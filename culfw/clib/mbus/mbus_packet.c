@@ -578,6 +578,24 @@ uint16 decodeRXBytesTmode(uint8* pByte, uint8* pPacket, uint16 packetSize)
   return (PACKET_OK);
 }
 
+uint16 verifyCrcBytesCmode(uint8* pByte, uint8* pPacket, uint16 packetSize)
+{
+  uint16 crc = 0;
+  for (uint16 i=0;i<packetSize - 2;i++) {
+    crc = crcCalc(crc, pByte[i]);
+    pPacket[i] = pByte[i];
+  }
+
+  if ((~crc) != (pByte[packetSize - 2] << 8 | pByte[packetSize - 1])) {
+    return (PACKET_CRC_ERROR);
+  }
+
+  pPacket[packetSize - 2] = pByte[packetSize - 2];
+  pPacket[packetSize - 1] = pByte[packetSize - 1];
+
+  return (PACKET_OK);
+}
+
 
 /***********************************************************************************
   Copyright 2008 Texas Instruments Incorporated. All rights reserved.
