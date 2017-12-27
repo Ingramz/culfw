@@ -30,8 +30,12 @@
 #define HAS_MORITZ                    // PROGMEM: 1696
 #define HAS_TX3                       // PROGMEM:  168
 #define HAS_TCM97001                  // PROGMEM:  264
+#  define HAS_MBUS                      // PROGMEM: 2536
+#  define TTY_BUFSIZE          128      // RAM: TTY_BUFSIZE*4
+#  define MBUS_NO_TX                       // PROGMEM:  962
+#  define RFR_FILTER                      // PROGMEM:   90b  RAM:  4b
 
-#if defined(RFbee12)
+#if 0 // defined(RFbee12)
 #  define RFR_FILTER                      // PROGMEM:   90b  RAM:  4b
 #  define HAS_HOERMANN_SEND               // PROGMEM:  220
 #  define HAS_FHT_TF
@@ -41,9 +45,7 @@
 #  define HAS_MEMFN                     // PROGMEM:  168
 #  define HAS_SOMFY_RTS                 // PROGMEM: 1716
 #  define HAS_BELFOX                    // PROGMEM:  214
-#  define HAS_ZWAVE                     // PROGMEM:  882
 #  define TTY_BUFSIZE          128      // RAM: TTY_BUFSIZE*4
-#  define HAS_MBUS                      // PROGMEM: 2536
 #  define MBUS_NO_TX                       // PROGMEM:  962
 #  define HAS_RFNATIVE                  // PROGMEM:  580
 #  define HAS_KOPP_FC                   // PROGMEM: 3370
