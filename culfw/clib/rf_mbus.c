@@ -300,7 +300,7 @@ void rf_mbus_task(void) {
         if (RXinfo.framemode == WMBUS_CMODE) {
           if (RXinfo.frametype == WMBUS_FRAMEA) {
             // Not implemented
-          } else if (RXinfo.frameType == WMBUS_FRAMEB) {
+          } else if (RXinfo.frametype == WMBUS_FRAMEB) {
             RXinfo.pByteIndex += 1;
             RXinfo.bytesLeft = RXinfo.length - 1;
           }
