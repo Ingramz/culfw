@@ -247,7 +247,7 @@ void rf_mbus_task(void) {
           // signaling byte. (http://www.ti.com/lit/an/swra522d/swra522d.pdf#page=6)
           if (RXinfo.mode == WMBUS_CMODE && RXinfo.pByteIndex[0] == 0x54) {
             RXinfo.framemode = WMBUS_CMODE;
-            // If we have determined that it is a C-mode frame, we have to determine if it is Type A or B. Currently
+            // If we have determined that it is a C-mode frame, we have to determine if it is Type A or B.
             if (RXinfo.pByteIndex[1] == 0xCD) {
               RXinfo.frametype = WMBUS_FRAMEA;
               // Frame format A is not implemented.
