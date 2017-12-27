@@ -261,6 +261,10 @@ void rf_mbus_task(void) {
               // For some reason if we don't request 2 extra bytes, the CRC will be incorrect. We do not use these
               // additional bytes, but it has to be done for some reason. Please fix this if you know why.
               RXinfo.length = RXinfo.lengthField + 3;
+            } else {
+              // Unknown type, reset.
+              RXinfo.state = 0;
+              return;
             }
           // T-Mode
           // Possible improvment: Check the return value from the deocding function,
