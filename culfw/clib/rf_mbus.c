@@ -270,10 +270,11 @@ void rf_mbus_task(void) {
           // Possible improvment: Check the return value from the deocding function,
           // and abort RX if coding error.
           } else if (decode3outof6(RXinfo.pByteIndex, bytesDecoded, 0) != DECODING_3OUTOF6_OK) {
-           RXinfo.state = 0;
-           return;
+            RXinfo.state = 0;
+            return;
           } else {
             RXinfo.framemode = WMBUS_TMODE;
+            RXinfo.frametype = WMBUS_FRAMEA;
             RXinfo.lengthField = bytesDecoded[0];
             RXinfo.length = byteSize(0, 0, (packetSize(RXinfo.lengthField)));
           }
@@ -371,15 +372,10 @@ void rf_mbus_task(void) {
 
       DC( 'b' );
       if (RXinfo.mode == WMBUS_CMODE) {
-        if (RXinfo.framemode == WMBUS_TMODE) {
-          DC('t');
-        } else if (RXinfo.framemode == WMBUS_CMODE) {
-          DC('c');
-          if (RXinfo.frametype == WMBUS_FRAMEA) {
-            DC('a');
-          } else if (RXinfo.frametype == WMBUS_FRAMEB) {
-            DC('b');
-          }
+        if (RXinfo.frametype == WMBUS_FRAMEA) {
+          DC('a');
+        } else if (RXinfo.frametype == WMBUS_FRAMEB) {
+          DC('b');
         }
       }
 
