@@ -256,11 +256,9 @@ void rf_mbus_task(void) {
             } else if (RXinfo.pByteIndex[1] == 0x3D) {
               RXinfo.frametype = WMBUS_FRAMEB;
               // Frame format B
-              // Move the length byte to be the first in byte buffer. This is manually incremented to RXinfo.length.
-              RXinfo.lengthField = RXinfo.pByteIndex[0] = RXinfo.pByteIndex[2];
-              // For some reason if we don't request 2 extra bytes, the CRC will be incorrect. We do not use these
-              // additional bytes, but it has to be done for some reason. Please fix this if you know why.
-              RXinfo.length = RXinfo.lengthField + 3;
+              RXinfo.lengthField = RXinfo.pByteIndex[2];
+              // preamble + L-field + payload
+              RXinfo.length = 2 + 1 + RXinfo.lengthField;
             } else {
               // Unknown type, reset.
               RXinfo.state = 0;
@@ -302,17 +300,8 @@ void rf_mbus_task(void) {
           halRfWriteReg(CC1100_PKTLEN, (uint8)(fixedLength));
         }
 
-        if (RXinfo.framemode == WMBUS_CMODE) {
-          if (RXinfo.frametype == WMBUS_FRAMEA) {
-            // Not implemented
-          } else if (RXinfo.frametype == WMBUS_FRAMEB) {
-            RXinfo.pByteIndex += 1;
-            RXinfo.bytesLeft = RXinfo.length - 1;
-          }
-        } else {
-          RXinfo.pByteIndex += 3;
-          RXinfo.bytesLeft   = RXinfo.length - 3;
-        }
+        RXinfo.pByteIndex += 3;
+        RXinfo.bytesLeft   = RXinfo.length - 3;
 
         // Set RX FIFO threshold to 32 bytes
         RXinfo.start = FALSE;
@@ -364,7 +353,7 @@ void rf_mbus_task(void) {
         // Not Implemented
       } else if (RXinfo.frametype == WMBUS_FRAMEB) {
         rxLength = RXinfo.lengthField + 1;
-        rxStatus = verifyCrcBytesCmode(MBbytes, MBpacket, rxLength);
+        rxStatus = verifyCrcBytesCmode(MBbytes + 2, MBpacket, rxLength);
       }
     }
 
