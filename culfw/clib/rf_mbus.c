@@ -250,13 +250,28 @@ void rf_mbus_task(void) {
             // If we have determined that it is a C-mode frame, we have to determine if it is Type A or B.
             if (RXinfo.pByteIndex[1] == 0xCD) {
               RXinfo.frametype = WMBUS_FRAMEA;
-              // Frame format A is not implemented.
-              RXinfo.state = 0;
-              return;
+
+              // Frame format A
+              RXinfo.lengthField = RXinfo.pByteIndex[2];
+
+              if (RXinfo.lengthField < 9) {
+                RXinfo.state = 0;
+                return;
+              }
+
+              // Number of CRC bytes = 2 * ceil((L-9)/16) + 2
+              // Preamble + L-field + payload + CRC bytes
+              RXinfo.length = 2 + 1 + RXinfo.lengthField + 2 * (2 + (RXinfo.lengthField - 10)/16);
             } else if (RXinfo.pByteIndex[1] == 0x3D) {
               RXinfo.frametype = WMBUS_FRAMEB;
               // Frame format B
               RXinfo.lengthField = RXinfo.pByteIndex[2];
+
+              if (RXinfo.lengthField < 12 || RXinfo.lengthField == 128) {
+                RXinfo.state = 0;
+                return;
+              }
+
               // preamble + L-field + payload
               RXinfo.length = 2 + 1 + RXinfo.lengthField;
             } else {
@@ -350,10 +365,11 @@ void rf_mbus_task(void) {
       rxLength = packetSize(MBpacket[0]);
     } else if (RXinfo.framemode == WMBUS_CMODE) {
       if (RXinfo.frametype == WMBUS_FRAMEA) {
-        // Not Implemented
+        rxLength = RXinfo.lengthField + 2 * (2 + (RXinfo.lengthField - 10)/16) + 1;
+        rxStatus = verifyCrcBytesCmodeA(MBbytes + 2, MBpacket, rxLength);
       } else if (RXinfo.frametype == WMBUS_FRAMEB) {
         rxLength = RXinfo.lengthField + 1;
-        rxStatus = verifyCrcBytesCmode(MBbytes + 2, MBpacket, rxLength);
+        rxStatus = verifyCrcBytesCmodeB(MBbytes + 2, MBpacket, rxLength);
       }
     }
 

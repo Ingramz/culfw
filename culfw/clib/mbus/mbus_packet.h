@@ -42,7 +42,8 @@ uint16 decodeRXBytesTmode(uint8* pByte, uint8* pPacket, uint16 packetSize);
 void   encodeTXBytesSmode(uint8* pByte, uint8* pPacket, uint16 packetSize);
 uint16 decodeRXBytesSmode(uint8* pByte, uint8* pPacket, uint16 packetSize);
 
-uint16 verifyCrcBytesCmode(uint8* pByte, uint8* pPacket, uint16 packetSize);
+uint16 verifyCrcBytesCmodeA(uint8* pByte, uint8* pPacket, uint16 packetSize);
+uint16 verifyCrcBytesCmodeB(uint8* pByte, uint8* pPacket, uint16 packetSize);
 
 
 #endif
