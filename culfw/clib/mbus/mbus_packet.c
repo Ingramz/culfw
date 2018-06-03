@@ -620,6 +620,10 @@ uint16 verifyCrcBytesCmodeA(uint8* pByte, uint8* pPacket, uint16 packetSize)
     --cycles;
   }
 
+  if (i == packetSize) {
+    return (PACKET_OK);
+  }
+
   while (i < packetSize - 2) {
     crc = crcCalc(crc, pByte[i]);
     pPacket[i] = pByte[i];
