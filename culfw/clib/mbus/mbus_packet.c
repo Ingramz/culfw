@@ -593,10 +593,11 @@ uint16 verifyCrcBytesCmodeA(uint8* pByte, uint8* pPacket, uint16 packetSize)
     return (PACKET_CRC_ERROR);
   }
 
-  while (i < 12) {
-    pPacket[i] = pByte[i];
-    ++i;
-  }
+  pPacket[i] = pByte[i];
+  ++i;
+  pPacket[i] = pByte[i];
+  ++i;
+  crc = 0;
 
   int cycles = (packetSize - 12) / 18;
   while (cycles > 0) {
@@ -614,6 +615,7 @@ uint16 verifyCrcBytesCmodeA(uint8* pByte, uint8* pPacket, uint16 packetSize)
     ++i;
     pPacket[i] = pByte[i];
     ++i;
+    crc = 0;
 
     --cycles;
   }
@@ -651,10 +653,11 @@ uint16 verifyCrcBytesCmodeB(uint8* pByte, uint8* pPacket, uint16 packetSize)
       return (PACKET_CRC_ERROR);
     }
 
-    while (i < 128) {
-      pPacket[i] = pByte[i];
-      ++i;
-    }
+    pPacket[i] = pByte[i];
+    ++i;
+    pPacket[i] = pByte[i];
+    ++i;
+    crc = 0;
   }
 
   while (i < packetSize - 2) {
